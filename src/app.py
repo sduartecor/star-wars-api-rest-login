@@ -383,7 +383,7 @@ def postVehicle():
     vehicle = Vehicle.query.filter_by(name=body["name"]).first() 
     
     if vehicle is None:
-        newVehicle = Vehicle(name=body["name"], vehicle_class=body["vehicle_class"], manufacturer=body["manufacturer"], cost_in_credits=body["cost_in_credits"], length=body["length"], crew=body["crew"], passengers=body["passengers"], max_atmospheric_speed=body["max_atmospheric_speed"], cargo_capacity=body["cargo_capacity"], consumables=body["consumables"])
+        newVehicle = Vehicle(name=body["name"], model=body["model"],vehicle_class=body["vehicle_class"], manufacturer=body["manufacturer"], cost_in_credits=body["cost_in_credits"], length=body["length"], crew=body["crew"], passengers=body["passengers"], max_atmospheric_speed=body["max_atmospheric_speed"], cargo_capacity=body["cargo_capacity"], consumables=body["consumables"])
         db.session.add(newVehicle)
         db.session.commit()
 
@@ -406,6 +406,7 @@ def putVehicle(id):
     
     if vehicle is not None:
         vehicle.name = body["name"]
+        vehicle.model =  body["model"]
         vehicle.vehicle_class = body["vehicle_class"]
         vehicle.manufacturer = body["manufacturer"]
         vehicle.cost_in_credits = body["cost_in_credits"]

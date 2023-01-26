@@ -93,6 +93,7 @@ class People(db.Model):
 class Vehicle(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250), nullable=False)
+    model = db.Column(db.String(250), nullable=False)
     vehicle_class = db.Column(db.String(250), nullable=False)
     manufacturer = db.Column(db.String(250), nullable=False)
     cost_in_credits = db.Column(db.Integer, nullable=False)
