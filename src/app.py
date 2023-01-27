@@ -490,41 +490,34 @@ def postFavoritePlanet(id):
 
     # Me fijo si existe el usuario
     user = User.query.filter_by(id=id).first()
-
-    if user is not None:
-        # Me fijo si existe el planeta
-        planet = Planet.query.filter_by(id=body["planet_id"]).first()
-
-        if planet is not None:
-            favoritePlanet = Favorite.query.filter_by(planet_id=body["planet_id"], user_id=id).first() 
-            
-            if favoritePlanet is None:
-                newFavorite = Favorite(user_id=id, planet_id=body["planet_id"])
-                db.session.add(newFavorite)
-                db.session.commit()
-
-                response_body = {
-                    "msg": "Planeta agregado a favorito con Exito"
-                }
-                return jsonify(response_body), 200
-
-            response_body = {
-                    "msg": "Ese usuario ya cuenta con ese planeta en favorito"
-                }
-            return jsonify(response_body), 400
-        
-        # Afuera del if
+    if user is None:
         response_body = {
-                "msg": "Planeta no existe"
-            }
-        return jsonify(response_body), 400
-
-    
-    # Afuera del if
-    response_body = {
             "msg": "Usuario no existe"
         }
-    return jsonify(response_body), 400
+        return jsonify(response_body), 400
+    # Me fijo si existe el planeta
+    planet = Planet.query.filter_by(id=body["planet_id"]).first()
+    if planet is None:
+        response_body = {
+                "msg": "Ese planeta no existe"
+            }
+        return jsonify(response_body), 400
+    # Me fijo si el usuario tiene ese planeta en favorito
+    favoritePlanet = Favorite.query.filter_by(planet_id=body["planet_id"], user_id=id).first()
+    if favoritePlanet is not None:
+        response_body = {
+                "msg": "Ese usuario ya cuenta con ese planeta en favorito"
+            }
+        return jsonify(response_body), 400
+    # Agrego el planeta a favorito
+    newFavorite = Favorite(user_id=id, planet_id=body["planet_id"])
+    db.session.add(newFavorite)
+    db.session.commit()
+
+    response_body = {
+                "msg": "Planeta agregado a favorito con Exito"
+            }
+    return jsonify(response_body), 200
 
 
 
@@ -535,45 +528,35 @@ def postFavoritePeople(id):
 
     # Me fijo si existe el usuario
     user = User.query.filter_by(id=id).first()
-
-    if user is not None:
-        people = People.query.filter_by(id=body["people_id"]).first()
-
-        if people is not None:
-            # Me fijo si existe el personaje
-            favoritePeople = Favorite.query.filter_by(people_id=body["people_id"], user_id=id).first() 
-            
-            if favoritePeople is None:
-                newFavorite = Favorite(user_id=id, people_id=body["people_id"])
-                db.session.add(newFavorite)
-                db.session.commit()
-
-                response_body = {
-                    "msg": "Personaje agregado a favorito con Exito"
-                }
-                return jsonify(response_body), 200
-
-            response_body = {
-                    "msg": "Ese usuario ya cuenta con ese personaje en favorito"
-                }
-            return jsonify(response_body), 400
-
-        # Afuera del if
+    if user is None:
         response_body = {
-                "msg": "Personaje no existe"
-            }
-        return jsonify(response_body), 400
-
-    
-    # Afuera del if
-    response_body = {
             "msg": "Usuario no existe"
         }
-    return jsonify(response_body), 400
+        return jsonify(response_body), 400
+    # Me fijo si existe el personaje
+    people = People.query.filter_by(id=body["people_id"]).first()
+    if people is None:
+        response_body = {
+                "msg": "Ese personaje no existe"
+            }
+        return jsonify(response_body), 400
+    # Me fijo si el usuario tiene ese personaje en favorito
+    favoritePeople = Favorite.query.filter_by(people_id=body["people_id"], user_id=id).first()
+    if favoritePeople is not None:
+        response_body = {
+                "msg": "Ese usuario ya cuenta con ese personaje en favorito"
+            }
+        return jsonify(response_body), 400
+    # Agrego el personaje a favorito
+    newFavorite = Favorite(user_id=id, people_id=body["people_id"])
+    db.session.add(newFavorite)
+    db.session.commit()
 
+    response_body = {
+            "msg": "Personaje agregado a favorito con Exito"
+            }
+    return jsonify(response_body), 200
 
-    
-   
 
 # Post - Vehicle Favorite for User
 @app.route('/users/<int:id>/favorite/vehicle', methods=['POST'])
@@ -582,74 +565,68 @@ def postFavoriteVehicle(id):
     
     # Me fijo si existe el usuario
     user = User.query.filter_by(id=id).first()
-
-    if user is not None:
-        # Me fijo si existe el vehiculo
-        vehicle = Vehicle.query.filter_by(id=body["vehicle_id"]).first()
-
-        if vehicle is not None:
-            
-            favoriteVehicle = Favorite.query.filter_by(vehicle_id=body["vehicle_id"], user_id=id).first() 
-            
-            if favoriteVehicle is None:
-                newFavorite = Favorite(user_id=id, vehicle_id=body["vehicle_id"])
-                db.session.add(newFavorite)
-                db.session.commit()
-
-                response_body = {
-                    "msg": "Vehiculo agregado a favorito con Exito"
-                }
-                return jsonify(response_body), 200
-
-            response_body = {
-                    "msg": "Ese usuario ya cuenta con ese vehiculo en favorito"
-                }
-            return jsonify(response_body), 400
-
-        # Afuera del if
+    if user is None:
         response_body = {
-                "msg": "Vehiculo no existe"
-            }
-        return jsonify(response_body), 400
-
-    
-    # Afuera del if
-    response_body = {
             "msg": "Usuario no existe"
         }
-    return jsonify(response_body), 400
+        return jsonify(response_body), 400
+    # Me fijo si existe el vehiculo
+    vehicle = Vehicle.query.filter_by(id=body["vehicle_id"]).first()
+    if vehicle is None:
+        response_body = {
+                "msg": "Ese vehiculo no existe"
+            }
+        return jsonify(response_body), 400
+    # Me fijo si el usuario tiene ese vehiculo en favorito
+    favoriteVehicle = Favorite.query.filter_by(vehicle_id=body["vehicle_id"], user_id=id).first()
+    if favoriteVehicle is not None:
+        response_body = {
+                "msg": "Ese usuario ya cuenta con ese vehiculo en favorito"
+            }
+        return jsonify(response_body), 400
+    # Agrego el vehiculo a favorito
+    newFavorite = Favorite(user_id=id, vehicle_id=body["vehicle_id"])
+    db.session.add(newFavorite)
+    db.session.commit()
+
+    response_body = {
+                "msg": "Vehiculo agregado a favorito con Exito"
+            }
+    return jsonify(response_body), 200
 
 # Delete - Planet Favorite for User
 @app.route('/users/<int:id>/favorite/planet', methods=['DELETE'])
 def deleteFavoritePlanet(id):
     body = json.loads(request.data) 
-    
     # Me fijo si existe el usuario
     user = User.query.filter_by(id=id).first()
-
-    if user is not None:
-        favoritePlanet = Favorite.query.filter_by(planet_id=body["planet_id"], user_id=id).first() 
-        
-        if favoritePlanet is not None:
-            db.session.delete(favoritePlanet)
-            db.session.commit()
-
-            response_body = {
-                "msg": "Planeta eliminado de favorito con Exito"
+    if user is None:
+        response_body = {
+            "msg": "Usuario no existe"
+        }
+        return jsonify(response_body), 400
+    # Me fijo si existe el planeta
+    planet = Planet.query.filter_by(id=body["planet_id"]).first()
+    if planet is None:
+        response_body = {
+                "msg": "Ese planeta no existe"
             }
-            return jsonify(response_body), 200
-
+        return jsonify(response_body), 400
+    # Me fijo si el usuario tiene ese planeta en favorito
+    favoritePlanet = Favorite.query.filter_by(planet_id=body["planet_id"], user_id=id).first()
+    if favoritePlanet is None:
         response_body = {
                 "msg": "Ese usuario ya no cuenta con ese planeta en favorito"
             }
         return jsonify(response_body), 400
+    # Agrego el planeta a favorito
+    db.session.delete(favoritePlanet)
+    db.session.commit()
 
-    
-    # Afuera del if
     response_body = {
-            "msg": "Usuario no existe"
-        }
-    return jsonify(response_body), 400
+                "msg": "Planeta eliminado de favorito con Exito"
+            }
+    return jsonify(response_body), 200
 
     
 
@@ -657,70 +634,70 @@ def deleteFavoritePlanet(id):
 @app.route('/users/<int:id>/favorite/people', methods=['DELETE'])
 def deleteFavoritePeople(id):
     body = json.loads(request.data) 
-
     # Me fijo si existe el usuario
     user = User.query.filter_by(id=id).first()
-
-    if user is not None:
-        favoritePeople = Favorite.query.filter_by(people_id=body["people_id"], user_id=id).first() 
-        
-        if favoritePeople is not None:
-            db.session.delete(favoritePeople)
-            db.session.commit()
-
-            response_body = {
-                "msg": "Personaje eliminado de favorito con Exito"
-            }
-            return jsonify(response_body), 200
-        
-
+    if user is None:
         response_body = {
-                "msg": "Ese usuario ya cuenta con ese personaje en favorito"
-            }
-        return jsonify(response_body), 400
-
-    
-    # Afuera del if
-    response_body = {
             "msg": "Usuario no existe"
         }
-    return jsonify(response_body), 400
+        return jsonify(response_body), 400
+    # Me fijo si existe el personaje
+    people = People.query.filter_by(id=body["people_id"]).first()
+    if people is None:
+        response_body = {
+                "msg": "Ese personaje no existe"
+            }
+        return jsonify(response_body), 400
+    # Me fijo si el usuario tiene ese personaje en favorito
+    favoritePeople = Favorite.query.filter_by(people_id=body["people_id"], user_id=id).first()
+    if favoritePeople is None:
+        response_body = {
+                "msg": "Ese usuario ya no cuenta con ese personaje en favorito"
+            }
+        return jsonify(response_body), 400
+    # Agrego el personaje a favorito
+    db.session.delete(favoritePeople)
+    db.session.commit()
 
+    response_body = {
+                "msg": "Personaje eliminado de favorito con Exito"
+            }
+    return jsonify(response_body), 200
     
 
 # Delete - Vehicle Favorite for User
 @app.route('/users/<int:id>/favorite/vehicle', methods=['DELETE'])
 def deleteFavoriteVehicle(id):
     body = json.loads(request.data) 
-
     # Me fijo si existe el usuario
     user = User.query.filter_by(id=id).first()
-
-    if user is not None:
-        favoriteVehicle = Favorite.query.filter_by(vehicle_id=body["vehicle_id"], user_id=id).first() 
-        
-        if favoriteVehicle is not None:
-            db.session.delete(favoriteVehicle)
-            db.session.commit()
-
-            response_body = {
-                "msg": "Vehiculo eliminado de favorito con Exito"
-            }
-            return jsonify(response_body), 200
-
+    if user is None:
         response_body = {
-                "msg": "Ese usuario ya cuenta con ese vehiculo en favorito"
-            }
-        return jsonify(response_body), 400
-
-    
-    # Afuera del if
-    response_body = {
             "msg": "Usuario no existe"
         }
-    return jsonify(response_body), 400
+        return jsonify(response_body), 400
+    # Me fijo si existe el vehiculo
+    vehicle = Vehicle.query.filter_by(id=body["vehicle_id"]).first()
+    if vehicle is None:
+        response_body = {
+                "msg": "Ese vehiculo no existe"
+            }
+        return jsonify(response_body), 400
+    # Me fijo si el usuario tiene ese vehiculo en favorito
+    favoriteVehicle = Favorite.query.filter_by(vehicle_id=body["vehicle_id"], user_id=id).first()
+    if favoriteVehicle is None:
+        response_body = {
+                "msg": "Ese usuario ya no cuenta con ese vehiculo en favorito"
+            }
+        return jsonify(response_body), 400
+    # Agrego el vehiculo a favorito
+    db.session.delete(favoriteVehicle)
+    db.session.commit()
 
-    
+    response_body = {
+                "msg": "Vehiculo eliminado de favorito con Exito"
+            }
+    return jsonify(response_body), 200
 
 
 
