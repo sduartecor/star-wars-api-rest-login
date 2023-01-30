@@ -10,6 +10,10 @@ from utils import APIException, generate_sitemap
 from admin import setup_admin
 from models import db, User, Planet, People, Vehicle, Favorite
 import json
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import JWTManager
 #from models import Person
 
 app = Flask(__name__)
@@ -27,6 +31,10 @@ db.init_app(app)
 CORS(app)
 setup_admin(app)
 
+# Setup the Flask-JWT-Extended extension
+app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
+jwt = JWTManager(app)
+
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
@@ -36,6 +44,80 @@ def handle_invalid_usage(error):
 @app.route('/')
 def sitemap():
     return generate_sitemap(app)
+
+# ----- Endpoint Authentication  -----
+
+# Post - User
+@app.route('/signup', methods=['POST'])
+def singup():
+    body = json.loads(request.data)
+    
+    user = User.query.filter_by(email=body["email"], username=body["username"]).first() 
+    
+    if user is None:
+        newUser = User(first_name=body["first_name"], last_name=body["last_name"], email=body["email"], password=body["password"], username=body["username"])
+        db.session.add(newUser)
+        db.session.commit()
+
+        response_body = {
+            "msg": "El usuario fue creado con exito"
+        }
+        return jsonify(response_body), 200
+
+    response_body = {
+            "msg": "El usuario ya existe en el sistema"
+        }
+    return jsonify(response_body), 400
+
+# Create a route to authenticate your users and return JWTs. The
+# create_access_token() function is used to actually generate the JWT.
+@app.route("/login", methods=["POST"])
+def login():
+    username = request.json.get("username", None)
+    password = request.json.get("password", None)
+
+    user = User.query.filter_by(username=username, password=password).first()
+
+    if user is None:
+        return jsonify({"msg": "User does not exist"}), 404
+
+
+    if username != user.username or password != user.password:
+        return jsonify({"msg": "Bad username or password"}), 401
+
+    access_token = create_access_token(identity=user.id)
+
+    response_body = {
+        "access_token": access_token,
+        "user": user.serialize()
+    }
+
+    return jsonify(response_body), 200
+
+# Protect a route with jwt_required, which will kick out requests
+# without a valid JWT present.
+@app.route("/private", methods=["GET"])
+@jwt_required()
+def private():
+    # Access the identity of the current user with get_jwt_identity
+    current_user_id = get_jwt_identity()
+
+    user = User.query.filter_by(id=current_user_id).first()
+
+    if user is None:
+        return jsonify({"msg": "User does not exist"}), 404
+
+    response_body = {
+        "status": "true",
+        "user": user.serialize()
+    }
+
+    return jsonify(response_body), 200
+
+# Handle/serialize errors like a JSON object
+@app.errorhandler(APIException)
+def handle_invalid_usage(error):
+    return jsonify(error.to_dict()), error.status_code
 
 # ----- Endpoint User -----
 
