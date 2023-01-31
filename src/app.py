@@ -52,20 +52,22 @@ def sitemap():
 def singup():
     body = json.loads(request.data)
     
-    user = User.query.filter_by(email=body["email"], username=body["username"]).first() 
+    user = User.query.filter_by(email=body["email"]).first() 
     
     if user is None:
-        newUser = User(first_name=body["first_name"], last_name=body["last_name"], email=body["email"], password=body["password"], username=body["username"])
-        db.session.add(newUser)
-        db.session.commit()
+        userDos = User.query.filter_by(username=body["username"]).first() 
+        if userDos is None:
+            newUser = User(first_name=body["first_name"], last_name=body["last_name"], email=body["email"], password=body["password"], username=body["username"])
+            db.session.add(newUser)
+            db.session.commit()
 
-        response_body = {
-            "msg": "El usuario fue creado con exito"
-        }
-        return jsonify(response_body), 200
+            response_body = {
+                "msg": "El usuario fue creado con exito"
+            }
+            return jsonify(response_body), 200
 
     response_body = {
-            "msg": "El usuario ya existe en el sistema"
+            "msg": "User exist in the system"
         }
     return jsonify(response_body), 400
 
@@ -76,7 +78,7 @@ def login():
     username = request.json.get("username", None)
     password = request.json.get("password", None)
 
-    user = User.query.filter_by(username=username, password=password).first()
+    user = User.query.filter_by(username=username).first()
 
     if user is None:
         return jsonify({"msg": "User does not exist"}), 404
@@ -163,29 +165,7 @@ def deleteUser(id):
             "msg": "Usuario no existe"
         }
     return jsonify(response_body), 400
-
-# Post - User
-@app.route('/users', methods=['POST'])
-def postUser():
-    body = json.loads(request.data)
     
-    user = User.query.filter_by(email=body["email"]).first() 
-    
-    if user is None:
-        newUser = User(first_name=body["first_name"], last_name=body["last_name"], email=body["email"], password=body["password"], username=body["username"])
-        db.session.add(newUser)
-        db.session.commit()
-
-        response_body = {
-            "msg": "El usuario fue creado con exito"
-        }
-        return jsonify(response_body), 200
-
-    response_body = {
-            "msg": "El usuario ya existe en el sistema"
-        }
-    return jsonify(response_body), 400
-
 # Put - User
 @app.route('/users/<int:id>', methods=['PUT'])
 def putUser(id):
